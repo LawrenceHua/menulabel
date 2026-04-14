@@ -3,116 +3,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, FileText, AlertTriangle, CheckCircle, Shield, Zap, Lock } from "lucide-react";
-
-interface AnalysisResult {
-  riskScore: number;
-  summary: string;
-  flaggedClauses: Array<{
-    type: string;
-    severity: "high" | "medium" | "low";
-    text: string;
-    explanation: string;
-    suggestion: string;
-  }>;
-}
-
-// Mock analysis for demo purposes
-const getMockAnalysis = (fileName: string): AnalysisResult => ({
-  riskScore: 65,
-  summary: `Analysis of "${fileName}" reveals several clauses that warrant careful review. The intellectual property assignment is broad, and the non-compete clause may be overly restrictive for your future work.`,
-  flaggedClauses: [
-    {
-      type: "Intellectual Property",
-      severity: "high",
-      text: "All work product created by Contractor shall be the exclusive property of Client. Contractor assigns all rights, title, and interest in such work product to Client.",
-      explanation: "This clause assigns ALL rights to the client, including rights to your tools, methods, and potentially reusable components. This is overly broad and could prevent you from using similar approaches in future projects.",
-      suggestion: "Negotiate to limit assignment to the final deliverables only, excluding your pre-existing tools, methods, and general know-how. Consider adding: 'Contractor retains all rights to pre-existing materials, tools, and general methodologies used in the creation of the work product.'",
-    },
-    {
-      type: "Non-Compete",
-      severity: "high",
-      text: "Contractor agrees not to compete with Client's business for a period of 2 years following termination of this Agreement.",
-      explanation: "A 2-year non-compete is lengthy and may be unenforceable in many jurisdictions, but could still create legal headaches. It could prevent you from working with similar clients in your specialty.",
-      suggestion: "Request removal or reduction to 6 months. If the client insists, ask for geographic limitations and specific definition of 'competing' services. Alternatively, offer a non-solicitation clause (won't solicit their clients) instead.",
-    },
-    {
-      type: "Payment Terms",
-      severity: "medium",
-      text: "Client agrees to pay Contractor within 30 days of invoice submission. Late payments subject to 1.5% monthly service charge.",
-      explanation: "Net 30 is standard but can strain cash flow. The late fee is reasonable, but you have no recourse if they simply don't pay.",
-      suggestion: "Consider requesting Net 15 for faster payment. Add a clause allowing you to pause work if payment is more than 15 days overdue. Consider requiring a 25-50% deposit upfront for new clients.",
-    },
-    {
-      type: "Indemnification",
-      severity: "medium",
-      text: "Contractor shall indemnify and hold harmless Client from any claims arising from Contractor's work.",
-      explanation: "This makes you solely responsible for any legal claims related to your work, even if the claim is frivolous or the client's fault. Legal defense costs can be substantial.",
-      suggestion: "Add mutual indemnification or limit your liability to the amount paid under the contract. Consider: 'Each party's liability shall be limited to the total amount paid or payable under this Agreement.'",
-    },
-    {
-      type: "Termination",
-      severity: "low",
-      text: "Either party may terminate this Agreement with 7 days written notice.",
-      explanation: "Short notice period means little job security. Client could terminate with minimal notice, leaving you scrambling to replace the income.",
-      suggestion: "Request 30 days notice for termination without cause. This provides more stability. You can offer a shorter notice period (7-14 days) if termination is for cause.",
-    },
-  ],
-});
+import { ChefHat, AlertTriangle, Printer, CheckCircle, Zap, Shield, Lock, ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
-  const [file, setFile] = useState<File | null>(null);
-  const [analyzing, setAnalyzing] = useState(false);
-  const [result, setResult] = useState<AnalysisResult | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = e.target.files?.[0];
-    if (selectedFile) {
-      const validTypes = [
-        "application/pdf",
-        "application/msword",
-        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-        "text/plain",
-      ];
-      if (validTypes.includes(selectedFile.type) || selectedFile.name.endsWith('.pdf') || selectedFile.name.endsWith('.doc') || selectedFile.name.endsWith('.docx')) {
-        setFile(selectedFile);
-        setError(null);
-        setResult(null);
-      } else {
-        setError("Please upload a PDF, Word document, or text file.");
-      }
-    }
-  };
-
-  const analyzeContract = async () => {
-    if (!file) return;
-
-    setAnalyzing(true);
-    setResult(null);
-
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 2000));
-
-    // Return mock analysis
-    setResult(getMockAnalysis(file.name));
-    setAnalyzing(false);
-  };
-
-  const getRiskColor = (score: number) => {
-    if (score >= 70) return "bg-red-500";
-    if (score >= 40) return "bg-yellow-500";
-    return "bg-green-500";
-  };
-
-  const getRiskLabel = (score: number) => {
-    if (score >= 70) return "High Risk";
-    if (score >= 40) return "Medium Risk";
-    return "Low Risk";
-  };
+  const [email, setEmail] = useState("");
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-slate-100">
@@ -120,14 +17,14 @@ export default function Home() {
       <header className="bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <Shield className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold text-slate-900">Contract Analyzer</span>
+            <ChefHat className="h-8 w-8 text-green-600" />
+            <span className="text-xl font-bold text-slate-900">MenuLabel AI</span>
           </div>
           <nav className="flex gap-4">
-            <Button variant="ghost">Features</Button>
-            <Button variant="ghost">Pricing</Button>
+            <a href="#features" className="inline-flex items-center justify-center rounded-lg border border-transparent text-sm font-medium px-2.5 py-2 h-8 gap-1.5 hover:bg-slate-100 text-slate-700">Features</a>
+            <a href="#pricing" className="inline-flex items-center justify-center rounded-lg border border-transparent text-sm font-medium px-2.5 py-2 h-8 gap-1.5 hover:bg-slate-100 text-slate-700">Pricing</a>
             <Button variant="outline">Sign In</Button>
-            <Button>Get Started</Button>
+            <Link href="/recipe"><Button>Start Free</Button></Link>
           </nav>
         </div>
       </header>
@@ -135,257 +32,255 @@ export default function Home() {
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center mb-12">
+          <Badge className="bg-green-100 text-green-800 mb-4">FDA 21 CFR §101.9 Compliant</Badge>
           <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-            AI-Powered Contract Review
+            Turn Recipe Ingredients into
             <br />
-            <span className="text-blue-600">for Freelancers</span>
+            <span className="text-green-600">FDA-Compliant Labels</span>
+            <br />
+            in 60 Seconds
           </h1>
           <p className="text-lg text-slate-600 max-w-2xl mx-auto">
-            Upload your contracts and get instant AI analysis. Identify risky clauses, 
-            understand terms, and protect yourself before signing.
+            Paste your ingredient list, get nutrition facts, allergen flags, and printable FDA-compliant labels. No subscriptions, no complex software — just results.
           </p>
+          <div className="flex gap-4 justify-center mt-8">
+            <Link href="/recipe"><Button size="lg" className="bg-green-600 hover:bg-green-700"><Zap className="mr-2 h-4 w-4" />Start Free — 3 Labels/mo</Button></Link>
+            <a href="#pricing" className="inline-flex items-center justify-center rounded-lg border border-border bg-background hover:bg-muted text-sm font-medium whitespace-nowrap transition-all h-9 gap-1.5 px-2.5">View Pricing<ArrowRight className="ml-2 h-4 w-4" /></a>
+          </div>
         </div>
 
-        {/* Upload Section */}
-        <Card className="max-w-2xl mx-auto">
-          <CardHeader>
-            <CardTitle>Analyze Your Contract</CardTitle>
-            <CardDescription>
-              Upload a PDF or Word document to get started. Free plan includes 3 analyses per month.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
-                  file ? "border-blue-500 bg-blue-50" : "border-slate-300 hover:border-slate-400"
-                }`}
-              >
-                <input
-                  type="file"
-                  accept=".pdf,.doc,.docx,.txt"
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="contract-upload"
-                />
-                <label htmlFor="contract-upload" className="cursor-pointer">
-                  <Upload className="h-12 w-12 mx-auto text-slate-400 mb-4" />
-                  <p className="text-slate-600 mb-2">
-                    {file ? file.name : "Drop your contract here or click to browse"}
-                  </p>
-                  <p className="text-sm text-slate-400">
-                    Supports PDF, Word, and text files
-                  </p>
-                </label>
-              </div>
+        {/* Feature Highlights */}
+        <div className="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
+          <Card>
+            <CardHeader>
+              <ChefHat className="h-10 w-10 text-green-600 mb-2" />
+              <CardTitle>Nutrition Facts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-slate-600 text-sm">
+                USDA-sourced data for calories, fat, carbs, protein, and sodium per serving. AI-enhanced accuracy for complex recipes.
+              </p>
+            </CardContent>
+          </Card>
 
-              {error && (
-                <Alert variant="destructive">
-                  <AlertTriangle className="h-4 w-4" />
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>{error}</AlertDescription>
-                </Alert>
-              )}
+          <Card>
+            <CardHeader>
+              <AlertTriangle className="h-10 w-10 text-red-500 mb-2" />
+              <CardTitle>Allergen Flags</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-slate-600 text-sm">
+                Detects all Big 9 allergens (milk, eggs, fish, shellfish, tree nuts, peanuts, wheat, soybeans, sesame) with red/green badges.
+              </p>
+            </CardContent>
+          </Card>
 
-              <Button
-                onClick={analyzeContract}
-                disabled={!file || analyzing}
-                className="w-full"
-                size="lg"
-              >
-                {analyzing ? (
-                  <>
-                    <Zap className="mr-2 h-4 w-4 animate-pulse" />
-                    Analyzing with AI...
-                  </>
-                ) : (
-                  <>
-                    <FileText className="mr-2 h-4 w-4" />
-                    Analyze Contract
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <Printer className="h-10 w-10 text-blue-600 mb-2" />
+              <CardTitle>Printable Labels</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-slate-600 text-sm">
+                Download FDA 21 CFR §101.9 formatted Nutrition Facts panels as PDF. Print and post in minutes.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
 
-        {/* Results Section */}
-        {result && (
-          <div className="max-w-4xl mx-auto mt-12 space-y-6">
-            {/* Risk Score */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center justify-between">
-                  Risk Assessment
-                  <Badge
-                    className={`${getRiskColor(result.riskScore)} text-white`}
-                  >
-                    {getRiskLabel(result.riskScore)}
-                  </Badge>
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <div className="flex justify-between text-sm">
-                    <span>Risk Score</span>
-                    <span className="font-medium">{result.riskScore}/100</span>
-                  </div>
-                  <Progress value={result.riskScore} className="h-3" />
-                  <p className="text-slate-600">{result.summary}</p>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Flagged Clauses */}
-            {result.flaggedClauses.length > 0 && (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Flagged Clauses</CardTitle>
-                  <CardDescription>
-                    Review these clauses carefully before signing
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    {result.flaggedClauses.map((clause, index) => (
-                      <Alert
-                        key={index}
-                        variant={clause.severity === "high" ? "destructive" : "default"}
-                        className="border-l-4"
-                        style={{
-                          borderLeftColor:
-                            clause.severity === "high"
-                              ? "#ef4444"
-                              : clause.severity === "medium"
-                              ? "#f59e0b"
-                              : "#22c55e",
-                        }}
-                      >
-                        <div className="flex items-start gap-2">
-                          {clause.severity === "high" ? (
-                            <AlertTriangle className="h-5 w-5 text-red-500 mt-0.5" />
-                          ) : (
-                            <CheckCircle className="h-5 w-5 text-yellow-500 mt-0.5" />
-                          )}
-                          <div className="flex-1">
-                            <AlertTitle className="flex items-center gap-2">
-                              {clause.type}
-                              <Badge
-                                variant={
-                                  clause.severity === "high"
-                                    ? "destructive"
-                                    : "secondary"
-                                }
-                              >
-                                {clause.severity}
-                              </Badge>
-                            </AlertTitle>
-                            <AlertDescription className="mt-2 space-y-2">
-                              <p className="text-sm italic bg-slate-100 p-2 rounded">
-                                &ldquo;{clause.text}&rdquo;
-                              </p>
-                              <p>{clause.explanation}</p>
-                              <div className="bg-blue-50 p-3 rounded-lg mt-2">
-                                <p className="text-sm font-medium text-blue-900">
-                                  Suggested Edit:
-                                </p>
-                                <p className="text-sm text-blue-800">
-                                  {clause.suggestion}
-                                </p>
-                              </div>
-                            </AlertDescription>
-                          </div>
-                        </div>
-                      </Alert>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            )}
+      {/* How It Works */}
+      <section className="bg-white py-16" id="features">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-slate-900">How It Works</h2>
+            <p className="text-slate-600 mt-2">Three steps from ingredients to compliant labels</p>
           </div>
-        )}
+
+          <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl font-bold text-green-700">1</span>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Enter Ingredients</h3>
+              <p className="text-slate-600 text-sm">Paste your ingredient list with quantities. One ingredient per line.</p>
+            </div>
+            <div className="text-center">
+              <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl font-bold text-green-700">2</span>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">AI Analysis</h3>
+              <p className="text-slate-600 text-sm">We look up USDA nutrition data and detect allergens automatically.</p>
+            </div>
+            <div className="text-center">
+              <div className="h-12 w-12 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <span className="text-xl font-bold text-green-700">3</span>
+              </div>
+              <h3 className="font-semibold text-lg mb-2">Download & Print</h3>
+              <p className="text-slate-600 text-sm">Get your FDA-compliant label PDF and print it immediately.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Allergen Info */}
+      <section className="py-16">
+        <div className="max-w-4xl mx-auto px-4">
+          <Card className="border-red-200">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <AlertTriangle className="h-5 w-5 text-red-500" />
+                The Big 9 Allergens — Detected Automatically
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
+                {["Milk", "Eggs", "Fish", "Shellfish", "Tree Nuts", "Peanuts", "Wheat", "Soybeans", "Sesame"].map((allergen) => (
+                  <div key={allergen} className="flex items-center gap-2 bg-red-50 px-3 py-2 rounded-lg">
+                    <div className="h-2 w-2 rounded-full bg-red-500" />
+                    <span className="text-sm font-medium text-red-800">{allergen}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="text-sm text-slate-600 mt-4">
+                FDA requires identification of these major allergens. MenuLabel AI flags them instantly from your ingredient list.
+              </p>
+            </CardContent>
+          </Card>
+        </div>
       </section>
 
       {/* Pricing Section */}
-      <section className="bg-white py-16">
+      <section className="bg-white py-16" id="pricing">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-slate-900">Simple Pricing</h2>
-            <p className="text-slate-600 mt-2">Choose the plan that works for you</p>
+            <h2 className="text-3xl font-bold text-slate-900">Simple, Honest Pricing</h2>
+            <p className="text-slate-600 mt-2">No surprise fees. Cancel anytime.</p>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
             {/* Free Plan */}
             <Card>
               <CardHeader>
                 <CardTitle>Free</CardTitle>
-                <CardDescription>For occasional contract reviews</CardDescription>
-                <div className="text-3xl font-bold mt-4">$0</div>
+                <CardDescription>Try it out risk-free</CardDescription>
+                <div className="text-3xl font-bold mt-4">$0<span className="text-lg font-normal text-slate-500">/mo</span></div>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>3 contract analyses per month</span>
+                    <span>3 labels per month</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Basic risk assessment</span>
+                    <span>Nutrition facts panel</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Email support</span>
+                    <span>Allergen detection</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span>PDF download</span>
+                  </li>
+                  <li className="flex items-center gap-2 text-slate-400">
+                    <span className="h-5 w-5">✗</span>
+                    <span>Watermark on labels</span>
                   </li>
                 </ul>
-                <Button variant="outline" className="w-full mt-6">
-                  Get Started
-                </Button>
+                <Link href="/recipe"><Button variant="outline" className="w-full mt-6">Get Started</Button></Link>
+              </CardContent>
+            </Card>
+
+            {/* Starter Plan */}
+            <Card className="border-green-500 border-2">
+              <CardHeader>
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle>Starter</CardTitle>
+                    <CardDescription>For small restaurants</CardDescription>
+                  </div>
+                  <Badge className="bg-green-600">Popular</Badge>
+                </div>
+                <div className="text-3xl font-bold mt-4">$19<span className="text-lg font-normal text-slate-500">/mo</span></div>
+              </CardHeader>
+              <CardContent>
+                <ul className="space-y-3">
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span>10 labels per month</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span>Full nutrition facts</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span>Allergen flags</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span>PDF download</span>
+                  </li>
+                  <li className="flex items-center gap-2">
+                    <CheckCircle className="h-5 w-5 text-green-500" />
+                    <span>No watermark</span>
+                  </li>
+                </ul>
+                <a href="https://buy.stripe.com/menulabel-starter" target="_blank" className="inline-flex items-center justify-center rounded-lg border border-transparent bg-green-600 hover:bg-green-700 text-white text-sm font-medium whitespace-nowrap transition-all h-8 gap-1.5 px-2.5 mt-6 w-full text-center">Subscribe — Starter</a>
               </CardContent>
             </Card>
 
             {/* Pro Plan */}
-            <Card className="border-blue-500 border-2">
+            <Card>
               <CardHeader>
-                <div className="flex justify-between items-start">
-                  <div>
-                    <CardTitle>Pro</CardTitle>
-                    <CardDescription>For freelancers & agencies</CardDescription>
-                  </div>
-                  <Badge className="bg-blue-500">Popular</Badge>
-                </div>
-                <div className="text-3xl font-bold mt-4">
-                  $29<span className="text-lg font-normal text-slate-500">/month</span>
-                </div>
+                <CardTitle>Pro</CardTitle>
+                <CardDescription>For growing menus</CardDescription>
+                <div className="text-3xl font-bold mt-4">$49<span className="text-lg font-normal text-slate-500">/mo</span></div>
               </CardHeader>
               <CardContent>
                 <ul className="space-y-3">
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Unlimited contract analyses</span>
+                    <span>Unlimited labels</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Advanced risk assessment</span>
+                    <span>Full nutrition facts</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Redline suggestions</span>
+                    <span>Priority processing</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Contract history & storage</span>
+                    <span>Bulk export</span>
                   </li>
                   <li className="flex items-center gap-2">
                     <CheckCircle className="h-5 w-5 text-green-500" />
-                    <span>Priority support</span>
+                    <span>No watermark</span>
                   </li>
                 </ul>
-                <Button className="w-full mt-6">
-                  Upgrade to Pro
-                </Button>
+                <a href="https://buy.stripe.com/menulabel-pro" target="_blank" className="inline-flex items-center justify-center rounded-lg border border-border bg-background hover:bg-muted text-sm font-medium whitespace-nowrap transition-all h-8 gap-1.5 px-2.5 mt-6 w-full text-center">Subscribe — Pro</a>
               </CardContent>
             </Card>
           </div>
+        </div>
+      </section>
+
+      {/* Compliance Note */}
+      <section className="py-12">
+        <div className="max-w-3xl mx-auto px-4 text-center">
+          <Alert className="bg-blue-50 border-blue-200">
+            <Shield className="h-5 w-5 text-blue-600" />
+            <AlertTitle className="text-blue-900">FDA Compliance Note</AlertTitle>
+            <AlertDescription className="text-blue-800 text-sm">
+              MenuLabel AI generates labels based on USDA FoodData Central and AI estimation. 
+              While we strive for accuracy, labels should be verified by a qualified nutritionist 
+              or food safety professional for official compliance. AI-estimated values are clearly marked.
+            </AlertDescription>
+          </Alert>
         </div>
       </section>
 
@@ -394,16 +289,16 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <Shield className="h-6 w-6 text-blue-500" />
-              <span className="text-lg font-bold text-white">Contract Analyzer</span>
+              <ChefHat className="h-6 w-6 text-green-500" />
+              <span className="text-lg font-bold text-white">MenuLabel AI</span>
             </div>
             <div className="flex items-center gap-2 text-sm">
               <Lock className="h-4 w-4" />
-              <span>Your contracts are secure and never stored permanently</span>
+              <span>Your recipes are secure and never stored permanently</span>
             </div>
           </div>
           <div className="mt-8 pt-8 border-t border-slate-800 text-center text-sm">
-            © 2026 Contract Analyzer by Huadini. All rights reserved.
+            © 2026 MenuLabel AI by Huadini. All rights reserved.
           </div>
         </div>
       </footer>
